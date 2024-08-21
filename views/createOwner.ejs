@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Main Block -->
+    <div class="main-box bg-one">
+        <div class="inner-block p-6 d-flex justify-content-between flex-column">
+            <div>
+                <a class="d-block mb-3" href="/createPet"><span class="material-symbols-outlined text-black">
+                        arrow_back
+                    </span></a>
+                <h1 class="f-30">And a little about you</h1>
+                <div class="mt-4">
+                    <div class="row gy-3">
+                        <div class="col-12">
+                            <label class="form-label">First Name*</label>
+                            <input class="form-control ps-0" name="first_name" type="text" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Last Name*</label>
+                            <input class="form-control ps-0" name="last_name" type="text" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Gender*</label>
+                            <div class="custom-select">
+                                <select class="form-select ps-0" name="gender" id="">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Age*</label>
+                            <input class="form-control ps-0" name="age" type="text" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <div><label class="f-18">Upload photos</label></div>
+                            <p class="f-14">
+                                You must add at least one photo to create your profile.
+                                Please make sure your pet’s face is well lit and visible.
+                            </p>
+
+                            <div class="upload-btn">
+                                <input type="file" name="images" id="upload">
+                                <label for="upload">
+                                    <img src="/images/up.svg" alt="">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 my-4">
+                    </div>
+                </div>
+            </div>
+            <a class="common-btn" href="#"><span>Proceed</span></a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script>
+        $(document).ready(function () {
+            const urlParam = new URLSearchParams(window.location.search);
+            // const userId = urlParam.get('user_id');
+            const userId = JSON.parse(localStorage.getItem('currentUser')).id;
+            // const current_user = JSON.parse(localStorage.getItem('currentUser'));
+            // if (userId != current_user.id) {
+            //     // Redirect to login if token is not present
+            //     window.location.href = '/';
+            // }
+
+            const $firstName = $('input[name="first_name"]');
+            const $lastName = $('input[name="last_name"]');
+            const $gender = $('select[name="gender"]');
+            const $age = $('input[name="age"]');
+            const $uploadInput = $('#upload');
+            const $imageContainer = $('.row.g-2'); // Container where images will be shown
+            let $images = [];
+            const urlParams = new URLSearchParams(window.location.search);
+            const ownerId = userId;
+
+
+            function displayImage(file, index) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgHtml = `
+                <div class="col-6">
+                    <div class="uloaded-img position-relative">
+                        <img class="cover" src="${e.target.result}" alt="">
+                        <a class="cls-btn position-absolute" href="#" data-index="${index}">
+                            <img src="/images/cls.svg" alt="">
+                        </a>
+                    </div>
+                </div>`;
+                    $imageContainer.append(imgHtml);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function removeImage(index) {
+                $images.splice(index, 1); // Remove the image from the array
+                $imageContainer.find(`a[data-index="${index}"]`).closest('.col-6').remove(); // Remove the image from the DOM
+                // Re-index the remaining images
+                $imageContainer.find('.cls-btn').each(function (i) {
+                    $(this).attr('data-index', i);
+                });
+            }
+
+            $('.common-btn').click(function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                const userData = new FormData();
+                userData.append('first_name', $firstName.val());
+                userData.append('last_name', $lastName.val());
+                userData.append('gender', $gender.val());
+                userData.append('age', $age.val());
+
+                $.each($images, function (index, image) {
+                    userData.append('images', image);
+                });
+
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    type: 'PUT',
+                    url: `/api/user/update/${ownerId}`, // replace with your API endpoint URL
+                    data: userData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        // window.location.href = `/home?user_id=${ownerId}`;
+                        window.location.href = `/home`;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+            $uploadInput.on('change', function () {
+                const files = Array.from(this.files);
+                files.forEach((file, index) => {
+                    $images.push(file);
+                    displayImage(file, $images.length - 1);
+                });
+                this.value = ''; // Reset input value to allow re-uploading the same file
+            });
+
+            $imageContainer.on('click', '.cls-btn', function (e) {
+                e.preventDefault();
+                const index = $(this).data('index');
+                removeImage(index);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

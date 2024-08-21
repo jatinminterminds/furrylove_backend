@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/slick-theme.css" rel="stylesheet">
+    <link href="/stylesheets/slick.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Main Block -->
+    <div class="main-box bg-two">
+        <div class="inner-block">
+            <div class="home-block">
+                <div class="row gx-0">
+                    <div class="col-12m position-relative bk-head">
+                        <div
+                            class="d-flex align-items-center justify-content-between position-absolute top-0 start-0 z-1 p-6 w-100">
+                            <a id="back_btn" href="<%= backUrl %>"><i class="fa-solid fa-arrow-left text-white"></i></a>
+                            <div class="heart-clicked">
+                                <input type="checkbox" name="" id="lk_<%= post.id %>">
+                                <label class="bg-transparent" for="lk_<%= post.id %>">
+                                    <i class="fa-regular fa-heart"></i>
+                                    <i class="fa-solid fa-heart"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="details-slide mb-0">
+                            <% post.images.forEach(function(image) { %>
+                                <div>
+                                    <div class="slide-img">
+                                        <img class="cover" src="<%= image %>" alt="" post_id="<%= post.id %>"
+                                            user_id="<%= post.user_id %>">
+                                    </div>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="f-20 text-black fw-700">
+                        <%= post.price %>
+                    </h3>
+                    <p class="text-black mb-0">
+                        <%= post.title %>
+                    </p>
+                </div>
+                <div class="data-details">
+                    <table class="w-100">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <p class="f-14 t-color mb-0"> <i class="fa-solid fa-location-dot me-2"
+                                            aria-hidden="true"></i>
+                                        <%= post.location %>
+                                    </p>
+                                </td>
+                                <td>
+                                    <span class="fw-600 text-black">
+                                        <%= post.date %>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-0 f-15 text-black text-start fw-700 py-4" colspan="2">
+                                    Details
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Brand</td>
+                                <td>
+                                    <%= post.brand %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Size</td>
+                                <td>
+                                    <%= post.size %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Color</td>
+                                <td>
+                                    <%= post.color %>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Product Condition</td>
+                                <td>
+                                    <%= post.condition %>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6">
+                    <h6 class="f-15 text-black fw-700">Description</h6>
+                    <p class="f-14 text-black op-55 mb-0">
+                        <%= post.description %>
+                    </p>
+                </div>
+                <div class="bottom-btns px-6 d-flex align-items-center gap-3">
+                    <button class="common-btn m-0">
+                        <i class="fa-regular fa-comment-dots align-middle me-2"></i>
+                        <span>Chat</span>
+                    </button>
+                    <button class="common-btn m-0">
+                        <i class="fa-solid fa-phone align-middle me-2"></i>
+                        <span>Call</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/slick.min.js"></script>
+    <script src="/javascripts/custom.js"></script>
+    <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            const userId = JSON.parse(localStorage.getItem('currentUser'));
+            if (!userId) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>

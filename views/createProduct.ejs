@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/slick-theme.css" rel="stylesheet">
+    <link href="/stylesheets/slick.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Main Block -->
+    <div class="main-box">
+        <div class="inner-block">
+            <div class="home-block">
+                <div class="top-head px-6 py-3 d-flex align-items-center">
+                    <i class="fa-regular fa-circle-xmark pointer" id="cross-product"></i>
+                    <h6 class="mx-auto t-color mb-0">Create product</h6>
+                </div>
+                <div class="f-15 text-black fw-700 mb-3 mt-4">Add Details</div>
+                <form class="create-form mb-4" action="">
+                    <div class="row gy-2">
+                        <div class="col-12">
+                            <label class="form-label">Brand*</label>
+                            <input class="form-control" type="text" name="brand" id="brand" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Size*</label>
+                            <input class="form-control" type="text" name="size" id="size" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Colour*</label>
+                            <input class="form-control" type="text" name="color" id="color" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Product Condition*</label>
+                            <input class="form-control" type="text" name="condition" id="condition" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Product Title*</label>
+                            <textarea class="form-control" name="title" id="title" cols="30" rows="2"
+                                placeholder="Enter here..."></textarea>
+                            <div class="text-end f-12 t4-color">Max 20 words</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description*</label>
+                            <textarea class="form-control" name="description" id="description" cols="30" rows="2"
+                                placeholder="Enter here..."></textarea>
+                            <div class="text-end f-12 t4-color">Max 20 words</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Set Item Price*</label>
+                            <input class="form-control" type="text" name="price" id="price" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Location*</label>
+                            <input class="form-control" type="text" name="location" id="location" placeholder="">
+                        </div>
+                        <div class="col-12">
+                            <div class="my-2"><label class="f-18 fw-700">Upload photos</label> <span
+                                    class="f-13 t3-color">(max 3 items)</span></div>
+
+                            <div class="upload-btn">
+                                <input type="file" name="photos" id="upload">
+                                <label for="upload">
+                                    <img src="/images/up.svg" alt="">
+                                </label>
+                                <p id="error-message" style="color: red; display: none;">You can only upload up to 3
+                                    images.</p>
+
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label"></label>
+                                <div class="row g-2" id="imageContainer">
+                                    <!-- Images will be appended here -->
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-12">
+                            <a class="common-btn d-block mt-4" id="submitPostForm" href="#"><span>Proceed</span></a>
+                        </div>
+                        <p id="success-msg" style="color: green; display: none;">Product created successfully!</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/slick.min.js"></script>
+    <script src="/javascripts/custom.js"></script>
+    <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const userId = urlParams.get('user_id');
+            const userId = JSON.parse(localStorage.getItem('currentUser')).id;
+            // const current_user = JSON.parse(localStorage.getItem('currentUser'));
+            // if (userId != current_user.id) {
+            //     window.location.href = '/';
+            // }
+            const $imageContainer = $('#imageContainer');
+            let $images = [];
+
+            function displayImage(file, index) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgHtml = `
+                        <div class="col-6">
+                            <div class="uloaded-img position-relative">
+                                <img class="cover" src="${e.target.result}" alt="">
+                                <a class="cls-btn position-absolute" href="#" data-index="${index}">
+                                    <img src="/images/cls.svg" alt="">
+                                </a>
+                            </div>
+                        </div>`;
+                    $imageContainer.append(imgHtml);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function removeImage(index) {
+                $images.splice(index, 1);
+                $imageContainer.find(`a[data-index="${index}"]`).closest('.col-6').remove();
+                $imageContainer.find('.cls-btn').each(function (i) {
+                    $(this).attr('data-index', i);
+                });
+            }
+
+            $('#submitPostForm').on('click', function (e) {
+                e.preventDefault();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                // const userId = urlParams.get('user_id');
+
+                let formData = new FormData();
+                formData.append('brand', $('#brand').val());
+                formData.append('size', $('#size').val());
+                formData.append('color', $('#color').val());
+                formData.append('product_condition', $('#condition').val());
+                formData.append('product_title', $('#title').val());
+                formData.append('description', $('#description').val());
+                formData.append('item_price', $('#price').val());
+                formData.append('location', $('#location').val());
+                formData.append('user_id', userId);
+
+                $.each($images, function (index, image) {
+                    formData.append('images', image);
+                });
+
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: 'http://localhost:3000/api/product/create',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (response) {
+                        console.log('Product created successfully:', response);
+                        $('#success-msg').show();
+                        $('#success-msg').fadeOut(3000);
+                    },
+                    error: function (error) {
+                        console.error('Error creating post:', error);
+                    }
+                });
+            });
+
+            $('#upload').on('change', function () {
+                const files = Array.from(this.files);
+                files.forEach((file, index) => {
+                    if ($images.length < 3) {
+                        $images.push(file);
+                        displayImage(file, $images.length - 1);
+                    } else {
+                        $('#error-message').show();
+                    }
+                });
+                this.value = '';
+            });
+
+            $imageContainer.on('click', '.cls-btn', function (e) {
+                e.preventDefault();
+                const index = $(this).data('index');
+                removeImage(index);
+            });
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
+            $('#cross-product').click(function () {
+                // window.location.href = `/products?user_id=${currentUser}`;
+                window.location.href = `/products`;
+            });
+        });
+    </script>
+
+</body>
+
+</html>

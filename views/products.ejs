@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title || 'Funny Love' %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/slick-theme.css" rel="stylesheet">
+    <link href="/stylesheets/slick.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="main-box bg-two">
+        <div class="inner-block py-6 pb-0 position-relative">
+            <div class="home-block my-4 px-6">
+                <div class="row gx-0">
+                    <div class="col-12">
+                        <div class="feed-head mb-3 d-flex align-items-center justify-content-between">
+                            <div class="feed-user d-flex align-items-center">
+                                <div class="usr-icon">
+                                    <img class="profile-image" src="<%= userProfile %>" alt="">
+                                </div>
+                                <div class="usr-info ps-3">
+                                    <h6 class="f-14 m-0 t-color">Hello</h6>
+                                    <div class="f-18 fw-700 t2-color">
+                                        <%= first_name %>
+                                            <%= last_name %>!
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="top-btns list-none d-flex align-items-center m-0 p-0">
+                                <li><span><i class="fa-regular fa-bell"></i></span></li>
+                            </ul>
+                        </div>
+                        <div class="search-block ps-4 bg-white position-relative">
+                            <span class="position-absolute translate-middle top-50"><img src="/images/serch.svg"
+                                    alt=""></span>
+                            <input class="form-control" type="text" placeholder="Search...">
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-black fw-400 my-4">Fresh Recommendations</h6>
+                <div class="row g-3">
+                    <% recommendations.forEach((recommendation, index)=> { %>
+                        <div class="col-6">
+                            <div class="recomend-box position-relative">
+                                <div class="recomend-img">
+                                    <img class="img-fluid" src="<%= recommendation.image %>" alt=""
+                                        user_id="<%= recommendation.data.user_id %>"
+                                        post_id="<%= recommendation.data.product_id %>"
+                                        user_name="<%= recommendation.data.user_name %>"
+                                        is_favourite="<%= recommendation.data.is_like %>"
+                                        is_favourite="<%= recommendation.data.is_favourite %>">
+                                </div>
+                                <div class="p-2">
+                                    <h6 class="f-14 t2-color fw-700">
+                                        <%= recommendation.price %>
+                                    </h6>
+                                    <p class="f-14 text-black mb-2">
+                                        <%= recommendation.description %>
+                                    </p>
+                                    <p class="f-14 t-color mb-0"> <i class="fa-solid fa-location-dot me-2"></i>
+                                        <%= recommendation.location %>
+                                    </p>
+                                </div>
+                                <div class="heart-clicked">
+                                    <input type="checkbox" name="like" id="lk_<%= index + 1 %>"
+                                        <%=recommendation.data.is_favourite ? 'checked' : '' %>>
+                                    <label class="position-absolute like-btn" for="lk_<%= index + 1 %>">
+                                        <i class="fa-regular fa-heart"></i>
+                                        <i class="fa-solid fa-heart"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+            <ul class="bottom-actions d-flex align-items-center justify-content-around mb-0 mt-4">
+                <li>
+                    <a href="#" id="home-btn">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="feed-btn">
+                        <i class="fa-regular fa-message"></i>
+                        <span>Feed</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <span>Chat</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="#" id="shop-btn">
+                        <i class="fa-solid fa-shop"></i>
+                        <span>Shop</span>
+                    </a>
+                </li>
+            </ul>
+            <span class="add-new position-absolute"><i class="fa-solid fa-circle-plus"
+                    id="create-new-product"></i></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/slick.min.js"></script>
+    <script src="/javascripts/custom.js"></script>
+    <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const userId = urlParams.get('user_id');
+            const userId = JSON.parse(localStorage.getItem('currentUser')).id;
+            // const current_user = JSON.parse(localStorage.getItem('currentUser'));
+
+            // if (userId != current_user.id) {
+            //     window.location.href = '/';
+            // }
+            $('.like-btn').on('click', function () {
+                const $this = $(this);
+                const imgElement = $(this).closest('.recomend-box').find('.recomend-img img');
+                const product_id = imgElement.attr('post_id');
+                const user_id = imgElement.attr('user_id');
+                const is_favourite = imgElement.attr('is_favourite') === 'true';
+
+                const token = localStorage.getItem('token');
+
+                $.ajax({
+                    url: 'http://localhost:3000/api/favourite/create',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    data: JSON.stringify({ product_id, user_id: userId }),
+                    success: function (response) {
+                        console.log(response.data.is_favourite);
+                        if (response.data.is_favourite) {
+                            $this.closest('.fa-regular').hide();
+                            $this.closest('.fa-solid').show();
+                            imgElement.attr('is_favourite', response.data.is_favourite);
+                        } else {
+                            $this.closest('.fa-regular').show();
+                            $this.closest('.fa-solid').hide();
+                            imgElement.attr('is_favourite', response.data.is_favourite);
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error creating favourite product:', error);
+                    }
+                });
+            });
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
+
+            $('.recomend-img img').click(function () {
+                window.location.href = `/productDetails?product_id=${$(this).attr('post_id')}`;
+            });
+            $('#create-new-product').click(function () {
+                // window.location.href = `/createProduct?user_id=${currentUser}`;
+                window.location.href = `/createProduct`;
+            });
+            $('#home-btn').click(function () {
+                // window.location.href = `/home?user_id=${currentUser}`;
+                window.location.href = `/home`;
+            });
+            $('#feed-btn').click(function () {
+                // window.location.href = `/feed?user_id=${currentUser}`;
+                window.location.href = `/feed`;
+            });
+            $('#shop-btn').click(function () {
+                // window.location.href = `/products?user_id=${currentUser}`;
+                window.location.href = `/products`;
+            });
+        });
+    </script>
+
+</body>
+
+</html>

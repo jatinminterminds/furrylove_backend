@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/slick-theme.css" rel="stylesheet">
+    <link href="/stylesheets/slick.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Main Block -->
+    <div class="main-box bg-two">
+        <div class="inner-block py-6 pb-0 position-relative">
+            <div class="home-block my-4 px-6">
+                <div class="row gx-0">
+                    <div class="col-12">
+                        <div class="feed-head mb-3 d-flex align-items-center justify-content-between">
+                            <div class="feed-user d-flex align-items-center">
+                                <div class="usr-icon">
+                                    <!-- <img src="images/pusr.png" alt=""> -->
+                                    <img class="profile-image" src="<%= userProfile %>" alt="">
+                                </div>
+                                <div class="usr-info ps-3">
+                                    <h6 class="f-14 m-0 t-color">Hello</h6>
+                                    <div class="f-18 fw-700 t2-color">
+                                        <%= first_name %>
+                                            <%= last_name %>!
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="top-btns list-none d-flex align-items-center m-0 p-0">
+                                <li><span><i class="fa-solid fa-sliders"></i></span></li>
+                                <li><span><i class="fa-regular fa-bell"></i></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-0">
+                    <div class="col-2">
+                        <button class="add-btn bg-transparent rounded border-0">
+                            <span class="round-box"><i class="fa-solid fa-circle-plus"></i></span>
+                            <label class="f-15 text-black fw-600">
+                                Me
+                            </label>
+                        </button>
+                    </div>
+                    <div class="col-10">
+                        <div class="dog-slider">
+                            <% dogImages.forEach(function(item) { %>
+                                <div>
+                                    <div class="text-center">
+                                        <div class="round-box">
+                                            <img class="story-carousel" src="<%= item.image %>" alt=""
+                                                user_id="<%= item.data.owner_id %>" post_id="<%= item.data.pet_id %>"
+                                                user_name="<%= item.data.user_name %>">
+                                        </div>
+                                        <!-- <label class="f-15 text-black fw-600">Me</label> -->
+                                        <label class="f-15 text-black fw-600">
+                                            <%= item.title %>
+                                        </label>
+                                    </div>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-0">
+                    <div class="col-12">
+                        <div class="carousel">
+                            <% carouselItems.forEach(function(item, index) { %>
+                                <div
+                                    class="carousel__item <%= index === 1 ? 'carousel__item--main' : (index === 0 ? 'carousel__item--left' : 'carousel__item--right') %>">
+                                    <img src="<%= item.image %>" alt="<%= item.alt %>"
+                                        user_id="<%= item.data.owner_id %>" post_id="<%= item.data.pet_id %>"
+                                        is_like="<%= item.data.is_like %>" is_favourite="<%= item.data.is_favourite %>">
+                                    <div class="carousel__text">
+                                        <h3>
+                                            <%= item.title %>
+                                        </h3>
+                                        <p>
+                                            <%= item.description %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <% }); %>
+                                    <div class="carousel__btns main-slider">
+                                        <button class="carousel__btn swiper-next" id="leftBtn"><svg
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path fill="currentColor" fill-rule="evenodd"
+                                                    d="m15 4l2 2l-6 6l6 6l-2 2l-8-8z" />
+                                            </svg></button>
+                                        <button class="carousel__btn swiper-prev" id="rightBtn"><svg
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path fill="currentColor" fill-rule="evenodd"
+                                                    d="m9.005 4l8 8l-8 8L7 18l6.005-6L7 6z" />
+                                            </svg></button>
+                                    </div>
+                                    <ul class="carousel-btns position-absolute w-100 start-0 p-0">
+                                        <li><span id="closeBtn"><i class="fa-solid fa-xmark"></i></span></li>
+                                        <li class="like-btn"><span><i class="fa-regular fa-heart"></i></span></li>
+                                        <li><span><i class="fa-regular fa-star favourite-btn"></i></span></li>
+                                    </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ul class="bottom-actions d-flex align-items-center justify-content-around mb-0 mt-4">
+                <li class="active">
+                    <a href="#" id="home-btn">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="feed-btn">
+                        <i class="fa-regular fa-message"></i>
+                        <span>Feed</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <span>Chat</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-regular fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="shop-btn">
+                        <i class="fa-solid fa-shop"></i>
+                        <span>Shop</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- <span class="add-new position-absolute"><i class="fa-solid fa-circle-plus"></i></span> -->
+        </div>
+    </div>
+
+
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/slick.min.js"></script>
+    <script src="/javascripts/custom.js"></script>
+    <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+
+    <script>
+        'use strict';
+
+        const current_user = JSON.parse(localStorage.getItem('currentUser'));
+        const token = localStorage.getItem('token');
+
+        let carouselItems = Array.from(document.querySelectorAll('.carousel__item'));
+        let currentItem = document.querySelector('.carousel__item--main') || carouselItems[0];
+        const leftBtn = document.querySelector('#leftBtn');
+        const rightBtn = document.querySelector('#rightBtn');
+        const closeBtn = document.querySelector('#closeBtn');
+
+        // Function to update the carousel classes
+        function updateCarouselClasses() {
+            if (carouselItems.length === 0) return;
+
+            const currentId = carouselItems.indexOf(currentItem);
+            const totalItems = carouselItems.length;
+            const leftItem = carouselItems[(currentId - 1 + totalItems) % totalItems];
+            const rightItem = carouselItems[(currentId + 1) % totalItems];
+
+            carouselItems.forEach((item) => {
+                item.classList.remove('carousel__item--left', 'carousel__item--right', 'carousel__item--main');
+            });
+
+            leftItem.classList.add('carousel__item--left');
+            currentItem.classList.add('carousel__item--main');
+            rightItem.classList.add('carousel__item--right');
+        }
+
+        // Function to update the current item and classes
+        function updateCurrentItem(newItem) {
+            currentItem = newItem;
+            updateCarouselClasses();
+        }
+
+        // Function to remove the current slide
+        function removeSlide() {
+            if (carouselItems.length <= 1) {
+                alert('Cannot remove the only slide.');
+                return;
+            }
+
+            const currentIndex = carouselItems.indexOf(currentItem);
+            currentItem.remove();
+            carouselItems = Array.from(document.querySelectorAll('.carousel__item')); // Update the list
+
+            if (carouselItems.length > 0) {
+                const newIndex = (currentIndex >= carouselItems.length ? carouselItems.length - 1 : currentIndex);
+                updateCurrentItem(carouselItems[newIndex]);
+            } else {
+                currentItem = null;
+            }
+        }
+
+        // Handle right button click
+        rightBtn.addEventListener('click', function () {
+            const nextItem = document.querySelector('.carousel__item--right');
+            if (nextItem) {
+                updateCurrentItem(nextItem);
+            }
+        });
+
+        // Handle left button click
+        leftBtn.addEventListener('click', function () {
+            const prevItem = document.querySelector('.carousel__item--left');
+            if (prevItem) {
+                updateCurrentItem(prevItem);
+            }
+        });
+
+        // Handle double-click event to swipe
+        carouselItems.forEach((item) => {
+            item.addEventListener('dblclick', function () {
+                if (item === currentItem) {
+                    const nextItem = document.querySelector('.carousel__item--right');
+                    if (nextItem) {
+                        updateCurrentItem(nextItem);
+                    }
+                } else {
+                    const prevItem = document.querySelector('.carousel__item--left');
+                    if (prevItem) {
+                        updateCurrentItem(prevItem);
+                    }
+                }
+                const $carouselMain = $('.carousel__item--main'); // Get the main carousel item
+                const $icon = $('i.fa-heart'); // Find the <i> element within the clicked .like-btn
+
+                // Toggle is_like attribute based on the active class
+                const isLiked = $('.carousel__item--main img').attr('is_like');
+                const isFav = $('.carousel__item--main img').attr('is_favourite');
+
+                // Update the icon class
+                if (isLiked == 'true') {
+                    $icon.removeClass('fa-regular').addClass('fa-solid');
+                } else {
+                    $icon.removeClass('fa-solid').addClass('fa-regular');
+                }
+
+                if (isFav == 'true') {
+                    $('.favourite-btn').removeClass('fa-regular').addClass('fa-solid');
+                } else {
+                    $('.favourite-btn').removeClass('fa-solid').addClass('fa-regular');
+                }
+            });
+        });
+
+        // Handle AJAX call on Like button click
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = currentItem.querySelector('img').getAttribute('user_id');
+                const postId = currentItem.querySelector('img').getAttribute('post_id');
+
+                const $icon = $('i.fa-heart');  // Find the <i> element within the clicked .like-btn
+
+                // Toggle the active class on the .like-btn
+                $('.like-btn').toggleClass('active');
+
+                // Check if the .like-btn now has the active class
+                if ($('.like-btn').hasClass('active')) {
+                    // Add fa-solid and remove fa-regular
+                    $icon.removeClass('fa-regular').addClass('fa-solid');
+                    $('.carousel__item--main img').attr('is_like', true);
+                } else {
+                    // Add fa-regular and remove fa-solid
+                    $icon.removeClass('fa-solid').addClass('fa-regular');
+                    $('.carousel__item--main img').attr('is_like', false);
+
+                }
+
+
+                $.ajax({
+                    url: 'http://localhost:3000/api/postLike/create',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        user_id: userId,
+                        post_id: postId
+                    }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (response) {
+                        console.log('Success!', response);
+                    },
+                    error: function (error) {
+                        console.error('Error adding like:', error);
+                    }
+                });
+            });
+        });
+
+        // Handle AJAX call on Favourite button click
+        document.querySelectorAll('.favourite-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = currentItem.querySelector('img').getAttribute('user_id');
+                const postId = currentItem.querySelector('img').getAttribute('post_id');
+
+                const $icon = $('i.fa-star');  // Find the <i> element within the clicked .like-btn
+
+                // Toggle the active class on the .like-btn
+                $('.favourite-btn').toggleClass('active');
+
+                // Check if the .like-btn now has the active class
+                if ($('.favourite-btn').hasClass('active')) {
+                    // Add fa-solid and remove fa-regular
+                    $icon.removeClass('fa-regular').addClass('fa-solid');
+                    $('.carousel__item--main img').attr('is_favourite', true);
+                } else {
+                    // Add fa-regular and remove fa-solid
+                    $icon.removeClass('fa-solid').addClass('fa-regular');
+                    $('.carousel__item--main img').attr('is_favourite', false);
+
+                }
+
+                const token = localStorage.getItem('token');
+
+                $.ajax({
+                    url: 'http://localhost:3000/api/favourite/create',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        user_id: userId,
+                        pet_id: postId
+                    }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (response) {
+                        console.log('Success!', response);
+                    },
+                    error: function (error) {
+                        console.error('Error adding favourite:', error);
+                    }
+                });
+            });
+        });
+
+        // Handle close button click event
+        // closeBtn.addEventListener('click', function () {
+        //     removeSlide();
+        // });
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
+
+        document.querySelector('#closeBtn').addEventListener('click', function () {
+            const petId = currentItem.querySelector('img').getAttribute('post_id');
+            const token = localStorage.getItem('token');
+            console.log(petId);
+
+            $.ajax({
+                url: 'http://localhost:3000/api/rejectedPet/create',
+                type: 'POST',
+                data: JSON.stringify({
+                    user_id: currentUser,
+                    pet_id: petId
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                success: function (response) {
+                    console.log('Pet rejected successfully!', response);
+                    removeSlide();  // Optionally remove the rejected slide
+                },
+                error: function (error) {
+                    console.error('Error rejecting pet:', error);
+                }
+            });
+        });
+
+
+        $('#home-btn').click(function () {
+            // window.location.href = `/home?user_id=${currentUser}`;
+            window.location.href = `/home`;
+        });
+        $('#feed-btn').click(function () {
+            // window.location.href = `/feed?user_id=${currentUser}`;
+            window.location.href = `/feed`;
+        });
+        $('#shop-btn').click(function () {
+            // window.location.href = `/products?user_id=${currentUser}`;
+            window.location.href = `/products`;
+        });
+
+        // Initialize the carousel classes
+        updateCarouselClasses();
+
+    </script>
+
+
+</body>
+
+</html>

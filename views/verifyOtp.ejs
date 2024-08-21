@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <!-- Main Block -->
+    <div class="main-box bg-one">
+        <div class="inner-block p-6 h-100 d-flex justify-content-between flex-column">
+            <div>
+                <a class="d-block mb-3" href="<%= backUrl || '#' %>">
+                    <span class="material-symbols-outlined text-black">
+                        arrow_back
+                    </span>
+                </a>
+                <h1 class="f-30">OTP Verification</h1>
+                <p class="f-13 mb-5">Enter the OTP sent to <%= phoneNumber || '+33 912 345 678' %>
+                </p>
+                <div class="mb-4">
+                    <label class="form-label">Enter OTP</label>
+                    <div class="row g-2">
+                        <% for (let i=0; i < 6; i++) { %>
+                            <div class="col">
+                                <input class="form-control" type="tel" maxlength="1" max="9" min="0" placeholder="">
+                            </div>
+                            <% } %>
+                    </div>
+                    <p class="error-msg" style="color:red; display:none"></p>
+                    <p class="success-msg" style="color:green; display:none"></p>
+                </div>
+                <p class="f-13">Didn't receive an OTP yet? <a class="resend deco t2-color fw-700 resendOtp"
+                        href="#">Resend
+                        OTP.</a></p>
+            </div>
+            <button class="common-btn verifyOtp"><span>Proceed</span></button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script>
+        $('.form-control').on('input', function () {
+            if ($(this).val().length === 1) {
+                $(this).closest('.col').next().find('input').focus();
+            }
+        }).on('keydown', function (e) {
+            if (e.which === 8) {
+                $(this).val('');
+                $(this).closest('.col').prev().find('input').focus();
+            }
+        });
+
+        $('.verifyOtp').click(() => {
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const userId = urlParams.get('user_id');
+            const userId = JSON.parse(localStorage.getItem('currentUser')).id;
+
+            const otpValues = [];
+            $('.form-control').each(function () {
+                otpValues.push($(this).val());
+            });
+            const otpValue = otpValues.join('');
+            const data = {
+                user_id: userId,
+                otp: otpValue
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/api/user/verifyOtp',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: (response) => {
+                    const token = response.data.token;
+                    const currentUserId = JSON.stringify(response.data.user);
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('currentUser', currentUserId);
+                    const isExistingUser = localStorage.getItem('isExistingUser');
+                    if (isExistingUser == 'true') {
+                        // window.location.href = `/home?user_id=${userId}`;
+                        window.location.href = `/home`;
+                    } else {
+                        // window.location.href = `/createPet?user_id=${userId}`;
+                        window.location.href = `/createPet`;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(JSON.parse(xhr.responseText).error.message);
+                    $('.error-msg').text(JSON.parse(xhr.responseText).error.message);
+                    $('.error-msg').show();
+                    $('.success-msg').hide();
+                }
+            });
+        });
+
+
+        $('.resendOtp').click((e) => {
+            e.preventDefault();
+            $('.form-control').val('');
+            const userId = JSON.parse(localStorage.getItem('currentUser')).id;
+            const data = {
+                user_id: userId
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/api/user/resendOtp',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: (response) => {
+                    $('.error-msg').hide();
+                    $('.success-msg').text(response.message);
+                    $('.success-msg').show();
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
