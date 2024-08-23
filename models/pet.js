@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       pet.belongsTo(models.user, { foreignKey: 'owner_id', as: 'owner' });
       pet.hasMany(models.rejected_pet, { foreignKey: 'pet_id', as: 'rejections' });
+      pet.hasMany(models.selected_pet, { foreignKey: 'pet_id', as: 'selections' });
     }
   }
   pet.init({

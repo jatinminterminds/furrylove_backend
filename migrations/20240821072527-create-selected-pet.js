@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('saved_posts', {
+    await queryInterface.createTable('selected_pets', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,10 +12,10 @@ module.exports = {
       user_id: {
         type: Sequelize.BIGINT
       },
-      post_id: {
+      pet_id: {
         type: Sequelize.BIGINT
       },
-      is_saved: {
+      is_selected: {
         type: Sequelize.BOOLEAN
       },
       created_at: {
@@ -29,6 +29,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('saved_posts');
+    await queryInterface.dropTable('selected_pets');
   }
 };

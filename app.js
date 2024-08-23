@@ -13,10 +13,11 @@ require('./config/db');
 
 // Set up session middleware
 app.use(session({
-    secret: 'furry-love', // Replace with your own secret key
-    resave: false,              // Forces the session to be saved back to the session store, even if it wasn't modified during the request
+    secret: process.env.SECRET_KEY,
+    resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+    store: new session.MemoryStore({ ttl: 1000 * 60 * 60 * 24 })
 }));
 
 var port = process.env.PORT || '3000';
@@ -32,8 +33,6 @@ app.use(cookieParser());
 
 app.use('/api', indexRouter);
 app.use('/', ejsRouter);
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}.`);

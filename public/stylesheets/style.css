@@ -451,6 +451,11 @@ button.common-btn {
     padding-left: 0;
 }
 
+.fa-solid.fa-bookmark {
+    color:orange;
+}
+
+
 
 
 
@@ -753,4 +758,44 @@ button.common-btn {
 
 .feed-img {
     height: auto;
+}
+
+.feed-page .inner-block, .products-page .inner-block {
+    margin-bottom: 4.5rem !important;
+}
+
+.feed-page .bottom-actions {
+    position: absolute;
+    bottom: 0%;
+    width: 29.2%;
+}
+
+.feed-page .add-new {
+    position: fixed !important;
+    right: 38%;
+    bottom: 15% !important;
+}
+
+.products-page .bottom-actions {
+    position: fixed;
+    bottom: 0;
+    width: 29.1%;
+    left: 35.5%;
+}
+
+.products-page .add-new {
+    position: fixed !important;
+    right: 38%;
+    bottom: 15% !important;
+}
+
+.home-page .bottom-actions {
+    position: fixed;
+    bottom: 0;
+    width: 29.3%;
+    z-index:999;
+}
+
+.home-page .inner-block {
+    margin-bottom: 7rem !important;
 }

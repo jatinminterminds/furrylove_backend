@@ -1,5 +1,4 @@
 const models = require('../models');
-const rejected_pet = require('../models/rejected_pet');
 const response = require('../utils/response');
 
 

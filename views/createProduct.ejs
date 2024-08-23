@@ -31,38 +31,46 @@
                         <div class="col-12">
                             <label class="form-label">Brand*</label>
                             <input class="form-control" type="text" name="brand" id="brand" placeholder="">
+                            <p class="error-message" id="brand-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Size*</label>
                             <input class="form-control" type="text" name="size" id="size" placeholder="">
+                            <p class="error-message" id="size-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Colour*</label>
                             <input class="form-control" type="text" name="color" id="color" placeholder="">
+                            <p class="error-message" id="color-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Product Condition*</label>
                             <input class="form-control" type="text" name="condition" id="condition" placeholder="">
+                            <p class="error-message" id="condition-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Product Title*</label>
                             <textarea class="form-control" name="title" id="title" cols="30" rows="2"
                                 placeholder="Enter here..."></textarea>
+                            <p class="error-message" id="title-error" style="color: red; display: none;"></p>
                             <div class="text-end f-12 t4-color">Max 20 words</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Description*</label>
                             <textarea class="form-control" name="description" id="description" cols="30" rows="2"
                                 placeholder="Enter here..."></textarea>
+                            <p class="error-message" id="description-error" style="color: red; display: none;"></p>
                             <div class="text-end f-12 t4-color">Max 20 words</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Set Item Price*</label>
                             <input class="form-control" type="text" name="price" id="price" placeholder="">
+                            <p class="error-message" id="price-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Location*</label>
                             <input class="form-control" type="text" name="location" id="location" placeholder="">
+                            <p class="error-message" id="location-error" style="color: red; display: none;"></p>
                         </div>
                         <div class="col-12">
                             <div class="my-2"><label class="f-18 fw-700">Upload photos</label> <span
@@ -103,13 +111,7 @@
 
     <script>
         $(document).ready(function () {
-            // const urlParams = new URLSearchParams(window.location.search);
-            // const userId = urlParams.get('user_id');
             const userId = JSON.parse(localStorage.getItem('currentUser')).id;
-            // const current_user = JSON.parse(localStorage.getItem('currentUser'));
-            // if (userId != current_user.id) {
-            //     window.location.href = '/';
-            // }
             const $imageContainer = $('#imageContainer');
             let $images = [];
 
@@ -136,13 +138,51 @@
                 $imageContainer.find('.cls-btn').each(function (i) {
                     $(this).attr('data-index', i);
                 });
+                if ($images.length === 0) {
+                    $('#error-message').text('You must upload at least one image.').show();
+                }
+            }
+
+            function validateForm() {
+                let isValid = true;
+
+                $('.form-control').each(function () {
+                    const $input = $(this);
+                    const value = $input.val().trim();
+                    const $error = $(`#${$input.attr('id')}-error`);
+
+                    if (value === '') {
+                        $error.text('This field is required.').show();
+                        isValid = false;
+                    } else {
+                        $error.hide();
+                    }
+                });
+
+                if ($images.length === 0) {
+                    $('#error-message').text('You must upload at least one image.').show();
+                    isValid = false;
+                } else {
+                    $('#error-message').hide();
+                }
+                return isValid;
+            }
+
+            function clearErrorMessage() {
+                const $this = $(this);
+                const value = $this.val().trim();
+                const $error = $(`#${$this.attr('id')}-error`);
+                if (value !== '') {
+                    $error.hide();
+                }
             }
 
             $('#submitPostForm').on('click', function (e) {
                 e.preventDefault();
 
-                const urlParams = new URLSearchParams(window.location.search);
-                // const userId = urlParams.get('user_id');
+                if (!validateForm()) {
+                    return;
+                }
 
                 let formData = new FormData();
                 formData.append('brand', $('#brand').val());
@@ -173,6 +213,9 @@
                         console.log('Product created successfully:', response);
                         $('#success-msg').show();
                         $('#success-msg').fadeOut(3000);
+                        $('.form-control').val('');
+                        $imageContainer.empty();
+                        $images = [];
                     },
                     error: function (error) {
                         console.error('Error creating post:', error);
@@ -182,14 +225,17 @@
 
             $('#upload').on('change', function () {
                 const files = Array.from(this.files);
-                files.forEach((file, index) => {
-                    if ($images.length < 3) {
-                        $images.push(file);
-                        displayImage(file, $images.length - 1);
-                    } else {
-                        $('#error-message').show();
-                    }
-                });
+                if ($images.length + files.length > 3) {
+                    $('#error-message').text('You can only upload up to 3 images.').show();
+                } else {
+                    $('#error-message').hide();
+                    files.forEach((file, index) => {
+                        if ($images.length < 3) {
+                            $images.push(file);
+                            displayImage(file, $images.length - 1);
+                        }
+                    });
+                }
                 this.value = '';
             });
 
@@ -199,13 +245,16 @@
                 removeImage(index);
             });
 
-            const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
             $('#cross-product').click(function () {
-                // window.location.href = `/products?user_id=${currentUser}`;
                 window.location.href = `/products`;
             });
+
+            $('.form-control').on('input', clearErrorMessage);
         });
     </script>
+
+
+
 
 </body>
 

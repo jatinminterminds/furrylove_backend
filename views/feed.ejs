@@ -16,26 +16,26 @@
 
 <body>
     <!-- Main Block -->
-    <div class="main-box bg-one">
+    <div class="main-box bg-one feed-page">
         <div class="inner-block py-6 pb-0 position-relative">
             <div class="px-6">
                 <h1 class="f-30 mt-3 mb-4">Feed</h1>
                 <div class="search-block ps-4 bg-white position-relative">
                     <span class="position-absolute translate-middle top-50"><img src="images/serch.svg" alt=""></span>
-                    <input class="form-control" type="text" placeholder="Search...">
+                    <input class="form-control" id="search-feed" type="text" placeholder="Search...">
                 </div>
             </div>
             <div class="feed-block my-4">
                 <div class="row gx-0 gy-4">
                     <% feedItems.forEach(function(feed) { %>
-                        <div class="col-12">
+                        <div class="col-12 main-feed">
                             <div class="feed-head px-6 mb-3 d-flex align-items-center justify-content-between">
                                 <div class="feed-user d-flex align-items-center">
                                     <div class="usr-icon">
                                         <img src="<%= feed.userIcon %>" alt="">
                                     </div>
                                     <div class="usr-info ps-3">
-                                        <h6 class="f-14 m-0 fw-700">
+                                        <h6 class="f-14 m-0 fw-700 user-name">
                                             <%= feed.userName %>
                                                 <% if (feed.userPartner) { %>
                                                     <span class="fw-400">and</span>
@@ -80,7 +80,8 @@
                                             </li>
                                         </ul>
                                     </div>
-                                    <i class="fa-regular fa-bookmark"></i>
+                                    <i class="<%= feed.is_saved ? 'fa-solid' : 'fa-regular' %> fa-bookmark"
+                                        id="save-post"></i>
                                 </div>
                             </div>
                         </div>
@@ -178,7 +179,55 @@
                 });
             });
 
+            $('body').on('click', '#save-post', function () {
+                const $this = $(this);
+                const post_id = $(this).parents('.col-12').find('.feed-img img').attr('post_id');
+                const user_id = $(this).parents('.col-12').find('.feed-img img').attr('current_user');
 
+                const token = localStorage.getItem('token');
+
+                $.ajax({
+                    url: 'http://localhost:3000/api/savedPost/create',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        user_id,
+                        post_id
+                    }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (response) {
+                        if (response.data.is_saved) {
+                            $this.removeClass('fa-regular').addClass('fa-solid');
+                        } else {
+                            $this.removeClass('fa-solid').addClass('fa-regular');
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error saving post:', error);
+                    }
+                });
+            });
+
+            $('#search-feed').on('keyup', function () {
+                var searchKeyword = $(this).val().toLowerCase();
+                $('.main-feed').each(function () {
+                    var ownerName = $(this).find('.user-name').text().toLowerCase().split('and')[0].trim();
+                    var partnerName = $(this).find('.user-name').text().toLowerCase().split('and')[1];
+                    if (partnerName) {
+                        partnerName = partnerName.trim();
+                    } else {
+                        partnerName = '';
+                    }
+                    if (ownerName.includes(searchKeyword) || partnerName.includes(searchKeyword)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
 
             $('#create-new-post').click(function () {
                 // window.location.href = `/createPost?user_id=${currentUser}`;

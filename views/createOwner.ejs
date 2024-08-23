@@ -121,35 +121,101 @@
 
             $('.common-btn').click(function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
-                const userData = new FormData();
-                userData.append('first_name', $firstName.val());
-                userData.append('last_name', $lastName.val());
-                userData.append('gender', $gender.val());
-                userData.append('age', $age.val());
+                var isValid = true; // Flag to check if all fields are valid
 
-                $.each($images, function (index, image) {
-                    userData.append('images', image);
-                });
-
-                const token = localStorage.getItem('token');
-                $.ajax({
-                    type: 'PUT',
-                    url: `/api/user/update/${ownerId}`, // replace with your API endpoint URL
-                    data: userData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        // window.location.href = `/home?user_id=${ownerId}`;
-                        window.location.href = `/home`;
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(xhr.responseText);
+                // Loop through all input fields to check for empty values
+                $('input[type="text"], select').each(function () {
+                    var $this = $(this);
+                    if ($this.val().trim() === '') {
+                        isValid = false;
+                        if ($this.next('.error-message').length === 0) {
+                            $this.after('<div class="error-message text-danger">This field is required</div>');
+                        } else {
+                            $this.next('.error-message').text('This field is required').show();
+                        }
+                    } else {
+                        $this.next('.error-message').hide();
                     }
                 });
+
+                // Check if an image is uploaded
+                var $fileInput = $('#upload');
+                var fileInputContainer = $fileInput.closest('.upload-btn').next('.error-message'); // Correctly target the error container
+                console.log($fileInput.get(0).files.length); // Debugging line to see the file length
+                if ($fileInput.get(0).files.length === 0) {
+                    isValid = false;
+                    if (fileInputContainer.length === 0) {
+                        $fileInput.closest('.upload-btn').after('<div class="error-message text-danger">Please upload at least one image</div>');
+                    } else {
+                        fileInputContainer.text('Please upload at least one image').show();
+                    }
+                } else if ($fileInput.get(0).files.length > 3) {
+                    isValid = false;
+                    if (fileInputContainer.length === 0) {
+                        $fileInput.closest('.upload-btn').after('<div class="error-message text-danger">You can upload a maximum of 3 images</div>');
+                    } else {
+                        fileInputContainer.text('You can upload a maximum of 3 images').show();
+                    }
+                } else {
+                    fileInputContainer.hide();
+                }
+                if (isValid) {
+
+                    const userData = new FormData();
+                    userData.append('first_name', $firstName.val());
+                    userData.append('last_name', $lastName.val());
+                    userData.append('gender', $gender.val());
+                    userData.append('age', $age.val());
+
+                    $.each($images, function (index, image) {
+                        userData.append('images', image);
+                    });
+
+                    const token = localStorage.getItem('token');
+                    $.ajax({
+                        type: 'PUT',
+                        url: `/api/user/update/${ownerId}`, // replace with your API endpoint URL
+                        data: userData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            // window.location.href = `/home?user_id=${ownerId}`;
+                            window.location.href = `/home`;
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+            $('input[type="text"]').on('input', function () {
+                var $this = $(this);
+                if ($this.val().trim() !== '') {
+                    $this.next('.error-message').hide();
+                }
+            });
+
+            // Hide error message when user selects a valid option in dropdowns
+            $('select').on('change', function () {
+                var $this = $(this);
+                if ($this.val() !== '') {
+                    $this.next('.error-message').hide();
+                }
+            });
+
+            // Hide error message when user selects a file
+            $('#upload').on('change', function () {
+                var $this = $(this);
+                var fileInputContainer = $this.closest('.upload-btn').next('.error-message');
+                console.log($this.get(0).files.length); // Debugging line to see the file length after change
+                if ($this.get(0).files.length > 0) {
+                    fileInputContainer.hide();
+                }
             });
 
             $uploadInput.on('change', function () {
@@ -158,7 +224,7 @@
                     $images.push(file);
                     displayImage(file, $images.length - 1);
                 });
-                this.value = ''; // Reset input value to allow re-uploading the same file
+                // this.value = ''; // Reset input value to allow re-uploading the same file
             });
 
             $imageContainer.on('click', '.cls-btn', function (e) {

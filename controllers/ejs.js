@@ -73,9 +73,19 @@ const home = async (req, res) => {
 
         const findPets = await models.pet.findAll({
             where: {
-                [Op.or]: [
-                    { '$rejections.user_id$': { [Op.ne]: userId } }, // Exclude pets rejected by the user
-                    { '$rejections.user_id$': null },// Include pets with no rejection records
+                [Op.and]: [
+                    {
+                        [Op.or]: [
+                            { '$rejections.user_id$': { [Op.ne]: userId } },
+                            { '$rejections.user_id$': null },
+                        ]
+                    },
+                    {
+                        [Op.or]: [
+                            { '$selections.user_id$': { [Op.ne]: userId } },
+                            { '$selections.user_id$': null },
+                        ]
+                    }
                 ],
                 owner_id: {
                     [Op.ne]: userId
@@ -85,7 +95,12 @@ const home = async (req, res) => {
                 {
                     model: models.rejected_pet,
                     as: 'rejections',
-                    required: false // Left join to include rejected pets
+                    required: false
+                },
+                {
+                    model: models.selected_pet,
+                    as: 'selections',
+                    required: false
                 }
             ]
         });
@@ -154,6 +169,8 @@ const products = async (req, res) => {
     try {
 
         const userId = req.session.current_user;
+        console.log(userId);
+
         // const userId = req.query.user_id;
         if (!userId) {
             return res.status(400).send('User ID is required');
@@ -215,7 +232,7 @@ const products = async (req, res) => {
                 image: images,
                 alt: '', // You can customize the alt text here if needed
                 price: product.item_price,
-                description: product.description,
+                title: product.product_title,
                 location: product.location,
                 data
             };
@@ -250,7 +267,8 @@ const products = async (req, res) => {
 
 const feed = async (req, res) => {
     try {
-        const currentId = req.session.current_user
+        const currentId = req.session.current_user;
+
         const findPosts = await models.post.findAll({
             order: [['id', 'desc']]
         });
@@ -287,22 +305,52 @@ const feed = async (req, res) => {
                 var userPartner = '';
             }
 
+            const savedPost = await models.saved_post.findOne({
+                where: {
+                    user_id: currentId,
+                    post_id: post.id
+                }
+            });
+
+            if (savedPost) {
+                var is_saved = savedPost.is_saved;
+            } else {
+                var is_saved = false
+            }
+
+            let userIcon = null;
+            let image = null;
+
+            if (user.image) {
+                const userImageArray = JSON.parse(user.image);
+                if (userImageArray.length > 0) {
+                    userIcon = userImageArray[0];
+                }
+            }
+
+            if (post.images) {
+                const postImageArray = JSON.parse(post.images);
+                if (postImageArray.length > 0) {
+                    image = postImageArray[0];
+                }
+            }
+
             return {
-                userIcon: JSON.parse(user.image)[0],
+                userIcon,
                 userName: user.first_name,
                 userPartner,
                 time,
                 location: post.location,
-                image: JSON.parse(post.images)[0],
+                image,
                 description: post.description,
                 liked,
                 likes: likeCounts,
                 comments: 0,
                 post_id: post.id,
-                current_user: currentId
+                current_user: currentId,
+                is_saved
             };
         }));
-
 
         res.render('feed', { title: 'Feed', feedItems: postData });
     } catch (error) {

@@ -28,6 +28,7 @@
                         <div class="col-12">
                             <label class="form-label">Enter Pet Name*</label>
                             <input class="form-control ps-0" type="text" name="pet-name" placeholder="">
+                            <div class="error-message text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Your Pet Category*</label>
@@ -38,10 +39,12 @@
                                     <!-- Add more categories if needed -->
                                 </select>
                             </div>
+                            <div class="error-message text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Enter Breed*</label>
                             <input class="form-control ps-0" type="text" name="breed" placeholder="">
+                            <div class="error-message text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Gender*</label>
@@ -51,6 +54,7 @@
                                     <option value="female">Female</option>
                                 </select>
                             </div>
+                            <div class="error-message text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Size*</label>
@@ -62,10 +66,12 @@
                                     <!-- Add more sizes if needed -->
                                 </select>
                             </div>
+                            <div class="error-message text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Age*</label>
                             <input class="form-control ps-0" type="text" name="age" placeholder="">
+                            <div class="error-message text-danger"></div>
                             <!-- <div class="custom-select">
                                 <select class="form-select ps-0" name="age" id="age">
                                     <option value="1 year">1 Year</option>
@@ -83,6 +89,7 @@
                                     <img src="/images/up.svg" alt="">
                                 </label>
                             </div>
+                            <div class="error-message text-danger" style="display: none;"></div>
                         </div>
                     </div>
                     <div class="row g-2 my-4">
@@ -148,38 +155,105 @@
             }
 
             $('.createPet').click(() => {
-                const petData = new FormData();
-                petData.append('owner_id', ownerId);
-                petData.append('pet_name', $petName.val());
-                petData.append('pet_category', $petCategory.val());
-                petData.append('breed', $breed.val());
-                petData.append('gender', $gender.val());
-                petData.append('size', $size.val());
-                petData.append('age', $age.val());
+                var isValid = true; // Flag to check if all fields are valid
 
-                $.each($images, function (index, image) {
-                    petData.append('images', image);
-                });
-
-                const token = localStorage.getItem('token');
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/pet/create', // replace with your API endpoint URL
-                    data: petData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        // window.location.href = `/createOwner?user_id=${ownerId}`;
-                        window.location.href = `/createOwner`;
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(xhr.responseText);
+                // Loop through all input fields to check for empty values
+                $('input[type="text"], select').each(function () {
+                    var $this = $(this);
+                    if ($this.val().trim() === '') {
+                        isValid = false;
+                        if ($this.next('.error-message').length === 0) {
+                            $this.after('<div class="error-message text-danger">This field is required</div>');
+                        } else {
+                            $this.next('.error-message').text('This field is required').show();
+                        }
+                    } else {
+                        $this.next('.error-message').hide();
                     }
                 });
+
+                // Check if an image is uploaded
+                var $fileInput = $('#upload');
+                var fileInputContainer = $fileInput.closest('.upload-btn').next('.error-message'); // Correctly target the error container
+                console.log($fileInput.get(0).files.length); // Debugging line to see the file length
+                if ($fileInput.get(0).files.length === 0) {
+                    isValid = false;
+                    if (fileInputContainer.length === 0) {
+                        $fileInput.closest('.upload-btn').after('<div class="error-message text-danger">Please upload at least one image</div>');
+                    } else {
+                        fileInputContainer.text('Please upload at least one image').show();
+                    }
+                } else if ($fileInput.get(0).files.length > 3) {
+                    isValid = false;
+                    if (fileInputContainer.length === 0) {
+                        $fileInput.closest('.upload-btn').after('<div class="error-message text-danger">You can upload a maximum of 3 images</div>');
+                    } else {
+                        fileInputContainer.text('You can upload a maximum of 3 images').show();
+                    }
+                } else {
+                    fileInputContainer.hide();
+                }
+
+
+
+                if (isValid) {
+                    const petData = new FormData();
+                    petData.append('owner_id', ownerId);
+                    petData.append('pet_name', $petName.val());
+                    petData.append('pet_category', $petCategory.val());
+                    petData.append('breed', $breed.val());
+                    petData.append('gender', $gender.val());
+                    petData.append('size', $size.val());
+                    petData.append('age', $age.val());
+
+                    $.each($images, function (index, image) {
+                        petData.append('images', image);
+                    });
+
+                    const token = localStorage.getItem('token');
+                    $.ajax({
+                        type: 'POST',
+                        url: '/api/pet/create', // replace with your API endpoint URL
+                        data: petData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            // window.location.href = `/createOwner?user_id=${ownerId}`;
+                            window.location.href = `/createOwner`;
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+            $('input[type="text"]').on('input', function () {
+                var $this = $(this);
+                if ($this.val().trim() !== '') {
+                    $this.next('.error-message').text('').hide();
+                }
+            });
+
+            // Hide error message when user selects a valid option in dropdowns
+            $('select').on('change', function () {
+                var $this = $(this);
+                if ($this.val() !== '') {
+                    $this.next('.error-message').text('').hide();
+                }
+            });
+
+            // Hide error message when user selects a file
+            $('#upload').on('change', function () {
+                var $this = $(this);
+                var fileInputContainer = $this.closest('.upload-btn').next('.error-message');
+                if ($this.get(0).files.length > 0) {
+                    fileInputContainer.text('').hide();
+                }
             });
 
             $uploadInput.on('change', function () {
@@ -188,7 +262,7 @@
                     $images.push(file);
                     displayImage(file, $images.length - 1);
                 });
-                this.value = ''; // Reset input value to allow re-uploading the same file
+                // this.value = ''; // Reset input value to allow re-uploading the same file
             });
 
             $imageContainer.on('click', '.cls-btn', function (e) {

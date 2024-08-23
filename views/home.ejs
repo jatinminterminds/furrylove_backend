@@ -18,7 +18,7 @@
 
 <body>
     <!-- Main Block -->
-    <div class="main-box bg-two">
+    <div class="main-box bg-two home-page">
         <div class="inner-block py-6 pb-0 position-relative">
             <div class="home-block my-4 px-6">
                 <div class="row gx-0">
@@ -263,51 +263,6 @@
             });
         });
 
-        // Handle AJAX call on Like button click
-        document.querySelectorAll('.like-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const userId = currentItem.querySelector('img').getAttribute('user_id');
-                const postId = currentItem.querySelector('img').getAttribute('post_id');
-
-                const $icon = $('i.fa-heart');  // Find the <i> element within the clicked .like-btn
-
-                // Toggle the active class on the .like-btn
-                $('.like-btn').toggleClass('active');
-
-                // Check if the .like-btn now has the active class
-                if ($('.like-btn').hasClass('active')) {
-                    // Add fa-solid and remove fa-regular
-                    $icon.removeClass('fa-regular').addClass('fa-solid');
-                    $('.carousel__item--main img').attr('is_like', true);
-                } else {
-                    // Add fa-regular and remove fa-solid
-                    $icon.removeClass('fa-solid').addClass('fa-regular');
-                    $('.carousel__item--main img').attr('is_like', false);
-
-                }
-
-
-                $.ajax({
-                    url: 'http://localhost:3000/api/postLike/create',
-                    type: 'POST',
-                    data: JSON.stringify({
-                        user_id: userId,
-                        post_id: postId
-                    }),
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function (response) {
-                        console.log('Success!', response);
-                    },
-                    error: function (error) {
-                        console.error('Error adding like:', error);
-                    }
-                });
-            });
-        });
 
         // Handle AJAX call on Favourite button click
         document.querySelectorAll('.favourite-btn').forEach(button => {
@@ -356,10 +311,6 @@
             });
         });
 
-        // Handle close button click event
-        // closeBtn.addEventListener('click', function () {
-        //     removeSlide();
-        // });
 
         const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
 
@@ -386,6 +337,37 @@
                 },
                 error: function (error) {
                     console.error('Error rejecting pet:', error);
+                }
+            });
+        });
+
+        $('body').on('click', '.like-btn', function () {
+            const $this = $(this)
+            const petId = currentItem.querySelector('img').getAttribute('post_id');
+            const token = localStorage.getItem('token');
+
+            $.ajax({
+                url: 'http://localhost:3000/api/selectedPet/create',
+                type: 'POST',
+                data: JSON.stringify({
+                    user_id: currentUser,
+                    pet_id: petId
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                success: function (response) {
+                    console.log('Pet selected successfully!', response);
+                    $this.find('.fa-heart').removeClass('fa-regular').addClass('fa-solid');
+                    setTimeout(() => {
+                        removeSlide();
+                        $this.find('.fa-heart').removeClass('fa-solid').addClass('fa-regular');
+                    }, 500);
+                },
+                error: function (error) {
+                    console.error('Error selecting pet:', error);
                 }
             });
         });

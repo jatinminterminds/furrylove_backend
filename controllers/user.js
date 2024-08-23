@@ -23,7 +23,9 @@ const loginUser = async (req, res) => {
                 otp,
                 otp_expire
             });
-            req.session.current_user = newUser.id;
+
+            const findData = await models.user.findOne({ where: { phone_number } });
+            req.session.current_user = findData.dataValues.id;
             response.success(res, 200, newUser, 'Data created successfully!');
         } else {
             const otp = generateOtp();
@@ -37,7 +39,9 @@ const loginUser = async (req, res) => {
                 }
             });
             const updatedData = await models.user.findOne({ where: { phone_number } });
-            req.session.current_user = updatedData.id;
+            console.log(updatedData);
+
+            req.session.current_user = updatedData.dataValues.id;
             response.success(res, 200, updatedData, 'Data updated successfully!');
         }
     } catch (error) {

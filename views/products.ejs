@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <div class="main-box bg-two">
+    <div class="main-box bg-two products-page">
         <div class="inner-block py-6 pb-0 position-relative">
             <div class="home-block my-4 px-6">
                 <div class="row gx-0">
@@ -42,12 +42,12 @@
                         <div class="search-block ps-4 bg-white position-relative">
                             <span class="position-absolute translate-middle top-50"><img src="/images/serch.svg"
                                     alt=""></span>
-                            <input class="form-control" type="text" placeholder="Search...">
+                            <input class="form-control" id="search-product" type="text" placeholder="Search...">
                         </div>
                     </div>
                 </div>
                 <h6 class="text-black fw-400 my-4">Fresh Recommendations</h6>
-                <div class="row g-3">
+                <div class="row g-3 product-list">
                     <% recommendations.forEach((recommendation, index)=> { %>
                         <div class="col-6">
                             <div class="recomend-box position-relative">
@@ -63,8 +63,8 @@
                                     <h6 class="f-14 t2-color fw-700">
                                         <%= recommendation.price %>
                                     </h6>
-                                    <p class="f-14 text-black mb-2">
-                                        <%= recommendation.description %>
+                                    <p class="f-14 text-black mb-2 product-title">
+                                        <%= recommendation.title %>
                                     </p>
                                     <p class="f-14 t-color mb-0"> <i class="fa-solid fa-location-dot me-2"></i>
                                         <%= recommendation.location %>
@@ -167,6 +167,18 @@
                     },
                     error: function (error) {
                         console.error('Error creating favourite product:', error);
+                    }
+                });
+            });
+
+            $('#search-product').on('keyup', function () {
+                var searchKeyword = $(this).val().toLowerCase();
+                $('.recomend-box').each(function () {
+                    var title = $(this).find('.product-title').text().toLowerCase();
+                    if (title.includes(searchKeyword)) {
+                        $(this).parent().show();
+                    } else {
+                        $(this).parent().hide();
                     }
                 });
             });

@@ -114,15 +114,24 @@
 
             $('#upload').on('change', function () {
                 const files = Array.from(this.files);
+                $images = []; // Reset the images array
+                $imageContainer.empty(); // Clear the image container
+                let valid = true;
+
                 files.forEach((file, index) => {
                     if ($images.length < 3) {
                         $images.push(file);
                         displayImage(file, $images.length - 1);
                     } else {
-                        $('#error-message').show();
+                        valid = false;
                     }
                 });
-                this.value = '';
+
+                if (!valid) {
+                    $('#error-message').text('You can only upload up to 3 images.').show();
+                } else {
+                    $('#error-message').hide(); // Hide the error message if valid
+                }
             });
 
             $imageContainer.on('click', '.cls-btn', function (e) {
@@ -131,41 +140,63 @@
                 removeImage(index);
             });
 
+            function validateFileInput() {
+                var $fileInput = $('#upload');
+                var errorMessage = $('#error-message');
+                var filesCount = $fileInput.get(0).files.length;
+                var valid = true; // Initialize valid as true
+
+                // Validate file input
+                if (filesCount === 0) {
+                    errorMessage.text('Please upload at least one image.').show();
+                    valid = false; // Set valid to false if validation fails
+                } else if (filesCount > 3) {
+                    errorMessage.text('You can only upload up to 3 images.').show();
+                    valid = false; // Set valid to false if validation fails
+                } else {
+                    errorMessage.hide(); // Hide error message if file count is valid
+                }
+
+                return valid; // Return the validity status
+            }
+
             $('#submitPostForm').on('click', function (e) {
                 e.preventDefault();
 
                 // const urlParams = new URLSearchParams(window.location.search);
                 // const userId = urlParams.get('user_id');
+                var valid = validateFileInput();
+                if (valid) {
+                    const formData = new FormData();
+                    formData.append('description', $('#description').val());
+                    formData.append('location', $('#location').val());
+                    formData.append('user_id', userId);
+                    $images.forEach((image, index) => {
+                        formData.append(`images`, image);
+                    });
 
-                const formData = new FormData();
-                formData.append('description', $('#description').val());
-                formData.append('location', $('#location').val());
-                formData.append('user_id', userId);
-                $images.forEach((image, index) => {
-                    formData.append(`images`, image);
-                });
+                    const token = localStorage.getItem('token');
 
-                const token = localStorage.getItem('token');
-
-                $.ajax({
-                    url: 'http://localhost:3000/api/post/create',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function (response) {
-                        console.log('Post created successfully:', response);
-                        // window.location.href = `/feed?user_id=${currentUser}`;
-                        window.location.href = `/feed`;
-                        // Redirect or perform additional actions here
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error creating post:', error);
-                    }
-                });
+                    $.ajax({
+                        url: 'http://localhost:3000/api/post/create',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        success: function (response) {
+                            console.log('Post created successfully:', response);
+                            // window.location.href = `/feed?user_id=${currentUser}`;
+                            window.location.href = `/feed`;
+                            // Redirect or perform additional actions here
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error creating post:', error);
+                        }
+                    });
+                }
             });
             const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
             $('#cross-post').click(function () {
