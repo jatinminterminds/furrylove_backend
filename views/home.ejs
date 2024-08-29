@@ -84,7 +84,7 @@
                                         is_like="<%= item.data.is_like %>" is_favourite="<%= item.data.is_favourite %>">
                                     <div class="carousel__text">
                                         <h3>
-                                            <%= item.title %>
+                                            <%= item.title %>, <%= item.age %>
                                         </h3>
                                         <p>
                                             <%= item.description %>
@@ -155,11 +155,21 @@
     <script src="/javascripts/slick.min.js"></script>
     <script src="/javascripts/custom.js"></script>
     <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
         'use strict';
 
         const current_user = JSON.parse(localStorage.getItem('currentUser'));
+
+        const socket = io();
+        socket.on('send-notification', (data) => {
+            if (Number(data.postOwnerId) == current_user.id) {
+                alert(`${data.currentUserName} liked your post!`);
+            }
+        });
+
+
         const token = localStorage.getItem('token');
 
         let carouselItems = Array.from(document.querySelectorAll('.carousel__item'));
@@ -333,7 +343,9 @@
                 },
                 success: function (response) {
                     console.log('Pet rejected successfully!', response);
-                    removeSlide();  // Optionally remove the rejected slide
+                    setTimeout(() => {
+                        removeSlide();  // Optionally remove the rejected slide
+                    }, 500);
                 },
                 error: function (error) {
                     console.error('Error rejecting pet:', error);

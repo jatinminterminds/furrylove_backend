@@ -125,6 +125,7 @@ const home = async (req, res) => {
                 image: images,
                 alt: '', // You can customize the alt text here if needed
                 title: pet.pet_name, // You can set a title if needed
+                age: pet.age,
                 description: '', // You can set a description if needed
                 data: {
                     owner_id: pet.owner_id,
@@ -335,6 +336,13 @@ const feed = async (req, res) => {
                 }
             }
 
+            const currentUser = await models.user.findByPk(currentId);
+            if (currentUser) {
+                var current_user_name = currentUser.first_name;
+            } else {
+                var current_user_name = '';
+            }
+
             return {
                 userIcon,
                 userName: user.first_name,
@@ -348,6 +356,8 @@ const feed = async (req, res) => {
                 comments: 0,
                 post_id: post.id,
                 current_user: currentId,
+                post_owner: post.user_id,
+                current_user_name,
                 is_saved
             };
         }));

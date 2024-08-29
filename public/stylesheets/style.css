@@ -622,7 +622,7 @@ button.common-btn {
     position: absolute;
     bottom: 0;
     z-index: 4;
-    opacity: 0;
+    opacity: 1;
     transition: opacity .2s;
     width: 100%;
     text-align: center;
@@ -630,7 +630,9 @@ button.common-btn {
     padding: 2rem 1rem;
     color: #fff;
 }
-
+.carousel__text h3 {
+    float:left;
+}
 .carousel__btns {
     position: absolute;
     left: 0;

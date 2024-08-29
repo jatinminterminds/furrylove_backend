@@ -48,7 +48,41 @@ const getAllSelectedPets = async (req, res) => {
     }
 }
 
+const getSelectedPetById = async (req, res) => {
+    try {
+        const selectedPetId = req.params.id;
+        const findSelectedPet = await models.selected_pet.findByPk(selectedPetId);
+        if (!findSelectedPet) {
+            return response.error(res, 404, 'Data not found!');
+        }
+        return response.success(res, 200, findSelectedPet, 'Data fetched successfully!');
+    } catch (error) {
+        return response.error(res, 500, 'Internal server error!');
+    }
+}
+
+const updateSelectedPet = async (req, res) => {
+    try {
+        const selectedPetId = req.params.id;
+        const findSelectedPet = await models.selected_pet.findByPk(selectedPetId);
+        if (!findSelectedPet) {
+            return response.error(res, 404, 'Data not found!');
+        }
+        await models.selected_pet.update({
+            is_selected: (findSelectedPet.is_selected ? false : true)
+        },{
+            where:{
+                id: selectedPetId
+            }
+        });
+    } catch (error) {
+        return response.error(req, 500, 'Internal server error!');
+    }
+}
+
 module.exports = {
     createSelectedPet,
-    getAllSelectedPets
+    getAllSelectedPets,
+    getSelectedPetById,
+    updateSelectedPet
 }

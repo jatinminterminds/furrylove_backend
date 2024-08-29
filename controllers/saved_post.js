@@ -77,8 +77,63 @@ const getAllSavedPosts = async (req, res) => {
     }
 }
 
+const getSavedPostById = async (req, res) => {
+    try {
+        const savedPostId = req.params.id;
+        const findSavedPost = await models.saved_post.findByPk(savedPostId);
+        if (!findSavedPost) {
+            return response.error(res, 404, 'Data not found!');
+        }
+        return response.success(res, 200, findSavedPost, 'Data fetched successfully!');
+    } catch (error) {
+        return response.error(res, 500, 'Internal server error!');
+    }
+}
+
+const updateSavedPost = async (req, res) => {
+    try {
+        const savedPostId = req.params.id;
+        const findSavedPost = await models.saved_post.findByPk(savedPostId);
+        if (!findSavedPost) {
+            return response.error(res, 404, 'Data not found!');
+        }
+        await models.saved_post.update({
+            is_saved: (findSavedPost.is_saved ? false : true)
+        }, {
+            where: {
+                id: savedPostId,
+            }
+        });
+        const updatedData = await models.saved_post.findByPk(savedPostId);
+        return response.success(res, 200, updatedData, 'Data updated successfully!');
+    } catch (error) {
+        return response.error(res, 500, 'Internal server error!');
+    }
+}
+
+const deleteSavedPost = async (req, res) => {
+    try {
+        const savedPostId = req.params.id;
+        const findSavedPost = await models.saved_post.findByPk(savedPostId);
+        if (!findSavedPost) {
+            return response.error(res, 404, 'Internal server error!');
+        }
+        await models.saved_post.destroy({
+            where: {
+                id: savedPostId
+            }
+        });
+        return response.success(res, 200, null, 'Data deleted successfully!');
+    } catch (error) {
+        return response.error(res, 500, 'Internal server error!');
+    }
+}
+
 
 module.exports = {
     createSavedPost,
-    getAllSavedPosts
+    getAllSavedPosts,
+    getSavedPostById,
+    updateSavedPost,
+    deleteSavedPost
 }

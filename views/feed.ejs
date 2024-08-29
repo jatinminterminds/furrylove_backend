@@ -55,7 +55,8 @@
                                 <span><img src="images/more.svg" alt=""></span>
                             </div>
                             <div class="feed-img mb-3">
-                                <img class="cover" src="<%= feed.image %>" alt="" post_id="<%= feed.post_id %>"
+                                <img class="cover" src="<%= feed.image %>" alt="" post_owner="<%= feed.post_owner %>"
+                                    current_user_name="<%= feed.current_user_name %>" post_id="<%= feed.post_id %>"
                                     current_user="<%= feed.current_user %>">
                             </div>
                             <div class="px-6">
@@ -123,7 +124,6 @@
                 </a>
             </li>
         </ul>
-
     </div>
 
     <script src="/javascripts/jquery.js"></script>
@@ -131,6 +131,7 @@
     <script src="/javascripts/slick.min.js"></script>
     <script src="/javascripts/custom.js"></script>
     <script src="https://kit.fontawesome.com/6cdac94a97.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -140,12 +141,20 @@
             // if (userId != current_user.id) {
             //     window.location.href = '/';
             // }
+            const socket = io();
+
+            function likePost(postId, likerId, postOwnerId, currentUserName) {
+                socket.emit('newLike', { postId, likerId, postOwnerId, currentUserName });
+            }
+
             const currentUser = JSON.parse(localStorage.getItem('currentUser')).id;
             $('body').on('click', '#like-btn', function () {
                 const $this = $(this);
 
                 const post_id = $(this).parents('.col-12').find('.feed-img img').attr('post_id');
                 const user_id = $(this).parents('.col-12').find('.feed-img img').attr('current_user');
+                const post_owner = $(this).parents('.col-12').find('.feed-img img').attr('post_owner');
+                const current_user_name = $(this).parents('.col-12').find('.feed-img img').attr('current_user_name');
 
                 const token = localStorage.getItem('token');
 
@@ -165,6 +174,7 @@
                         var likeCounts = Number($this.next().text());
                         if (response.data.is_like) {
                             $this.removeClass('fa-regular').addClass('fa-solid');
+                            likePost(post_id, user_id, post_owner, current_user_name);
                             likeCounts++;
                             $this.next().text(likeCounts);
                         } else {

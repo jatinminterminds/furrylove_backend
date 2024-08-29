@@ -7,8 +7,13 @@ var ejsRouter = require('./routes/ejs');
 const response = require('./utils/response');
 const models = require('./models');
 const { Op } = require('sequelize');
+const { createServer } = require('node:http');
+const { Server } = require('socket.io');
 const session = require('express-session');
 var app = express();
+const server = createServer(app);
+const io = new Server(server);
+require('./socket')(io);
 require('./config/db');
 
 // Set up session middleware
@@ -34,6 +39,6 @@ app.use(cookieParser());
 app.use('/api', indexRouter);
 app.use('/', ejsRouter);
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}.`);
 });
